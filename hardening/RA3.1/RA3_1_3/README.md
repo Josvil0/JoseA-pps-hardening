@@ -45,7 +45,7 @@ Validación de la regla manual con ID 1234.
 Se han simulado dos ataques comunes que son interceptados automáticamente por las reglas de OWASP:
 
 
-[Foto 2 - Pruebas](img/Foto2.png)
+![Foto 2 - Pruebas](img/Foto2.png)
 
 ##  Análisis de Auditoría (Logs de ModSecurity)
 
