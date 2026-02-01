@@ -30,7 +30,7 @@ Construcción de la imagen basada en el endurecimiento previo (3.1.1) e integrac
 docker run -d --name pps3.1.2 -p 8080:80 -p 8081:443 josea13/pps:pr3.1.2
 ```
 
-![Foto1 - Contenedor corriendo](img/foto1.png)
+![Foto1 - Contenedor corriendo](img/Foto1.png)
 ##  Verificación del WAF (Prueba de Inyección)
 
 Se ha validado la eficacia del firewall simulando un ataque de Cross-Site Scripting (XSS).
@@ -39,7 +39,7 @@ curl -I "http://localhost:8080/test.php?test=<script>alert(1)</script>"
 ```
 
 Resultado obtenido:
-![Foto2 - Resultado](img/foto2.png)
+![Foto2 - Resultado](img/Foto2.png)
 
 
 ##  Conclusiones
