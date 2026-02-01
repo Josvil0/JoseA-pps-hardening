@@ -1,17 +1,47 @@
-# RA3.1.2 - WAF ModSecurity
+# Implementación de WAF ModSecurity (RA3.1.2)
 
-**Estudiante:** Jose Alonso 
-**Imagen Docker Hub:** `josea13/pps:pps_pr3.1.2`
+**Autor:** Jose Alonso Villanova
 
-## Implementación de Seguridad
-Se ha implementado un Firewall de Aplicación Web (WAF) utilizando ModSecurity para proteger el servidor contra ataques de capa 7:
-- **ModSecurity Engine:** Configurado en modo `On` para detectar y bloquear ataques en tiempo real (sustituyendo el modo por defecto `DetectionOnly`).
-- **OWASP Core Rule Set (CRS):** Integración de las reglas estándar de la industria para mitigar las vulnerabilidades del "Top 10 de OWASP".
-- **Protección contra Inyección:** Reglas activas para identificar y denegar intentos de SQL Injection y Command Injection.
-- **Prevención de XSS:** Filtrado de etiquetas `<script>` y otros vectores de Cross-Site Scripting en parámetros GET y POST.
-- **Protocol Anomaly Detection:** Bloqueo de peticiones mal formadas que no cumplen con los estándares HTTP.
+**Imagen Docker Hub:** Josea13/pps:pr3.1.2
 
-## Validación
-- **Simulación de Ataque SQLi:** Intento de acceso mediante parámetros maliciosos como `' OR 1=1 --`, resultando en error **403 Forbidden**.
-- **Simulación de Ataque XSS:** Inyección de código JavaScript `<script>` en la URL, verificando el bloqueo automático por el WAF.
-- **Inspección de Logs:** Verificación en el log de auditoría de ModSecurity de los intentos de intrusión registrados y bloqueados.
+```markdown
+**Comando para descargar la imagen:**
+`docker pull josea13/pps:pr3.1.2`
+```
+
+## Introducción
+
+En esta fase se ha integrado un Web Application Firewall (WAF) mediante el módulo ModSecurity. A diferencia del bastionado básico, el WAF proporciona una capa de defensa activa que inspecciona el tráfico HTTP en tiempo real para bloquear ataques dirigidos a la capa de aplicación.
+
+## Configuración Técnica
+
+Para la activación del firewall, se han realizado las siguientes acciones en el contenedor:
+
+- Instalación: Inclusión de libapache2-mod-security2 y el motor de PHP.
+
+- Activación del motor: Se ha modificado la directiva SecRuleEngine de DetectionOnly a On en el archivo /etc/modsecurity/modsecurity.conf.
+
+- Reglas: Uso del conjunto de reglas recomendadas por el Core Rule Set (CRS) para la detección de anomalías.
+
+##  Infraestructura y Despliegue
+
+Construcción de la imagen basada en el endurecimiento previo (3.1.1) e integración del firewall:
+```Bash
+docker run -d --name pps3.1.2 -p 8080:80 -p 8081:443 josea13/pps:pr3.1.2
+```
+
+![Foto1 - Contenedor corriendo](img/foto1.png)
+##  Verificación del WAF (Prueba de Inyección)
+
+Se ha validado la eficacia del firewall simulando un ataque de Cross-Site Scripting (XSS).
+```Bash
+curl -I "http://localhost:8080/test.php?test=<script>alert(1)</script>"
+```
+
+Resultado obtenido:
+![Foto2 - Resultado](img/foto2.png)
+
+
+##  Conclusiones
+
+El WAF ModSecurity bloquea peticiones maliciosas y protege la aplicación frente a inyecciones XSS, asegurando la integridad de los scripts PHP.

@@ -1,30 +1,26 @@
 FROM debian:latest
 
-# 1. Instalar Apache
-RUN apt-get update && apt-get install -y apache2 && apt-get clean
+RUN apt-get update && apt-get install -y apache2 openssl && apt-get clean
 
-# 2. Activar módulos necesarios
-RUN a2enmod headers
+# Habilitar módulos necesarios para el hardening
+RUN a2enmod ssl && a2enmod rewrite && a2enmod headers
 
-# 3. Aplicar tu configuración de Hardening
-COPY hardening.conf /etc/apache2/conf-available/hardening.conf
-RUN a2enconf hardening
+# Aplicar configuración de Hardening
+COPY hardening.conf /etc/apache2/conf-available/security-hardening.conf
+RUN a2enconf security-hardening
 
-# --- EL CAMBIO CLAVE AQUÍ ---
-# Desactivamos el archivo de seguridad por defecto de Debian que sobreescribe tus cambios
-RUN a2disconf security
-# ----------------------------
+# Reutilizamos el certificado de la práctica anterior para que sea HTTPS
+RUN mkdir -p /etc/apache2/ssl && \
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /etc/apache2/ssl/apache.key \
+    -out /etc/apache2/ssl/apache.crt \
+    -subj "/C=ES/ST=Castellon/L=Castellon/O=Caminas/OU=Web/CN=www.caminas.com"
 
-# 4. Forzar las directivas globales al final del archivo principal
+# Configuración del VirtualHost (copia el que ya tenías de la 3.2)
+COPY default-ssl.conf /etc/apache2/sites-available/default-ssl.conf
+RUN a2dissite 000-default.conf && a2ensite default-ssl.conf
 RUN echo "ServerTokens Prod" >> /etc/apache2/apache2.conf
 RUN echo "ServerSignature Off" >> /etc/apache2/apache2.conf
-RUN echo "TraceEnable Off" >> /etc/apache2/apache2.conf
+EXPOSE 80 443
 
-# 5. Permisos y archivos de prueba
-RUN chown -R www-data:www-data /var/www/html
-RUN mkdir -p /var/www/html/secreto
-RUN touch /var/www/html/secreto/archivo_privado.txt
-
-EXPOSE 80
-
-CMD ["apachectl", "-D", "FOREGROUND"]
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]

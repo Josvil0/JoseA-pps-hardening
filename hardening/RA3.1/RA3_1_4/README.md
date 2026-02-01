@@ -1,24 +1,57 @@
-# RA3.1 - Práctica 4: Evitar ataques DoS
+# Prevención de Ataques DoS con Mod_Evasive (RA3.1.4)
 
-**Estudiante:** Jose Alonso
-**Imagen Docker Hub:** `josea13/pps:pr4`
+**Autor:** Jose Alonso Villanova
 
-## Descripción
-Se ha incorporado el módulo **mod_evasive** para proteger el servidor Apache contra ataques de Denegación de Servicio (DoS). El módulo detecta ráfagas de peticiones desde una misma IP y las bloquea temporalmente.
+**Imagen Docker Hub:** josea13/pps:pr3.1.4
 
-## Implementación
-1. **Heredabilidad:** `FROM josea13/pps:pr3.1.3` (mantiene WAF y OWASP).
-2. **Instalación:** Módulo `libapache2-mod-evasive`.
-3. **Configuración:**
-   - `DOSPageCount 2`: Bloquea si se pide la misma página > 2 veces/seg.
-   - `DOSBlockingPeriod 10`: Baneo de 10 segundos tras detectar el ataque.
-   - Directorio de logs: `/var/log/mod_evasive`.
+```markdown
+**Comando para descargar la imagen:**
+`docker pull josea13/pps:pr3.1.4`
+```
 
-## Validación con Apache Bench (ab)
-Se ha realizado un ataque de 100 peticiones con una concurrencia de 10:
-`ab -n 100 -c 10 http://localhost:8083/index.html`
 
-**Resultado del informe:**
-- **Complete requests:** 100
-- **Non-2xx responses:** 82
-- **Conclusión:** El sistema ha bloqueado exitosamente 82 peticiones mediante un error **403 Forbidden**, demostrando que el escudo contra DoS está activo.
+
+## Introducción
+
+En esta práctica se ha implementado el módulo mod_evasive para proteger el servidor Apache contra ataques de denegación de servicio (DoS) y ataques de fuerza bruta. El módulo monitorea las IPs entrantes y bloquea temporalmente aquellas que superan los umbrales de peticiones definidos.
+
+## Configuración Técnica
+
+Se ha aplicado una configuración restrictiva en el archivo evasive.conf para garantizar la detección inmediata durante las pruebas:
+
+- DOSPageCount 2: Bloquea la IP si solicita la misma página más de 2 veces por segundo.
+
+- DOSBlockingPeriod 10: El baneo temporal dura 10 segundos.
+
+- DOSLogDir: Se ha creado y configurado el directorio /var/log/mod_evasive con los permisos adecuados (www-data) para registrar los bloqueos.
+
+
+## Infraestructura y Despliegue
+
+Primeramente se levanta el contenedor con la configuracion
+
+```Bash
+docker run -d --name pps3.1.4 -p 8080:80 -p 8081:443 josea13/pps:pr3.1.4
+```
+##  Verificación de Seguridad (Evidencia)
+
+Para validar el funcionamiento, se ha utilizado la herramienta de estrés Apache Bench (ab), simulando una carga de 100 peticiones concurrentes.
+
+Comando ejecutado:
+```Bash
+ab -n 100 -c 10 http://localhost:8080/index.html
+```
+
+Resultados del Informe:
+
+- Peticiones totales: 100
+
+- Peticiones fallidas (Bloqueadas): 85
+
+- Non-2xx responses: 85 (Código 403 Forbidden enviado por el WAF/Evasive).
+
+![Foto 2 - Resultado](img/foto2.png)
+
+## Conclusiones
+
+El módulo mod_evasive añade una capa de protección crítica al nivel de red/transporte. Los resultados demuestran que, ante un intento de saturación, el servidor responde denegando el acceso a la fuente sospechosa, preservando la disponibilidad de los recursos para usuarios legítimos.
