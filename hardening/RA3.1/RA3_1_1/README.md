@@ -28,7 +28,7 @@ docker run -d --name pps3.1.1 -p 8080:80 -p 8081:443 josea13/pps:pr3.1.1
   
 ```
 
-![Foto 1 - Contenedor en ejecucion](img/foto1.png)
+![Foto 1 - Contenedor en ejecucion](img/Foto1.png)
 
 
 ## Verificación de Medidas (Evidencias)
@@ -41,7 +41,7 @@ Validación de la correcta entrega de las directivas HSTS y CSP mediante una pet
 curl -kI https://localhost:8081
 ```
 
-![Foto 2 - Cabeceras de seguridad](img/foto2.png)
+![Foto 2 - Cabeceras de seguridad](img/Foto2.png)
 
 ###  Restricción de Acceso a Directorios
 
@@ -50,13 +50,13 @@ Verificación de que el servidor no permite listar el contenido de carpetas que 
 curl -I https://localhost:8080/test/  
 ```
  
-![Foto 3 - Sin acceso a directorios](img/foto3.png)
+![Foto 3 - Sin acceso a directorios](img/Foto3.png)
 
 ### Validación del Protocolo Seguro (SSL/TLS)
 
 Acceso al servicio mediante el puerto seguro para verificar la correcta carga del sitio bajo HTTPS.
 
-![Foto 4 - Interfaz web](img/foto4.png)
+![Foto 4 - Interfaz web](img/Foto4.png)
 
 ##  Conclusiones
 
